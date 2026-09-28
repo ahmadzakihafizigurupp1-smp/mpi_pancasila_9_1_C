@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPI - Hak dan Kewajiban Warga Negara</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Hide default scrollbar for chip nav */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom scrollbar for main content */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f8fafc; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Animation for tab content */
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* 3D Flip Card Styles */
+        .flip-card { background-color: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .flip-card-front { background-color: #ffffff; border: 2px solid #e0e7ff; color: #1e293b; }
+        .flip-card-back { background-color: #4f46e5; color: white; transform: rotateY(180deg); border: 2px solid #4f46e5; }
+        .flip-card:hover .flip-card-front { border-color: #818cf8; }
+
+        /* Print styles */
+        @media print {
+            .print\:hidden { display: none !important; }
+            body { background: white; }
+            .tab-content { display: block !important; page-break-after: always; }
+            .custom-scroll { overflow: visible !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header Area -->
+    <header class="bg-white shadow-sm z-20 flex-shrink-0 print:hidden relative">
+        <div class="px-4 py-3 md:px-8 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex flex-col">
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-md tracking-wide">PENDIDIKAN PANCASILA • IX SMP</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md tracking-wide">BAB 1 SUBBAB C</span>
+                </div>
+                <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 leading-tight">Hak dan Kewajiban Warga Negara dalam UUD NRI 1945</h1>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center text-sm font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                    <i class="fa-solid fa-layer-group mr-2 text-indigo-500"></i>
+                    <span id="module-indicator">Modul 1 / 7</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-indigo-600 flex items-center justify-center transition-colors" title="Cetak Modul">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                    <button onclick="toggleFullscreen()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-indigo-600 flex items-center justify-center transition-colors" title="Layar Penuh">
+                        <i class="fa-solid fa-expand" id="fs-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigasi Chip Horizontal -->
+    <nav class="bg-white border-b border-slate-200 z-10 flex-shrink-0 print:hidden shadow-sm">
+        <div class="flex overflow-x-auto hide-scrollbar gap-2 px-4 py-3 md:px-8 scroll-smooth" id="chip-container">
+            <button onclick="openTab('tab1', this, 1)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-200 transition-all duration-300">
+                <i class="fa-solid fa-compass mr-2"></i>Konsep Dasar
+            </button>
+            <button onclick="openTab('tab2', this, 2)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-scale-unbalanced mr-2"></i>Hak Warga Negara
+            </button>
+            <button onclick="openTab('tab3', this, 3)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-hands-holding-circle mr-2"></i>Kewajiban Warga
+            </button>
+            <button onclick="openTab('tab4', this, 4)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-scale-balanced mr-2"></i>Keseimbangan Hak & Kewajiban
+            </button>
+            <button onclick="openTab('tab5', this, 5)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-layer-group mr-2"></i>Kuis Flashcard
+            </button>
+            <button onclick="openTab('tab6', this, 6)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-clipboard-check mr-2"></i>Asesmen Isian
+            </button>
+            <button onclick="openTab('tab7', this, 7)" class="nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300">
+                <i class="fa-solid fa-lightbulb mr-2"></i>Kesimpulan
+            </button>
+        </div>
+    </nav>
+
+    <!-- Area Konten Utama -->
+    <main class="flex-1 overflow-y-auto custom-scroll p-4 md:p-8 bg-slate-50 relative">
+        <div class="max-w-5xl mx-auto">
+            
+            <!-- TAB 1: KONSEP DASAR -->
+            <div id="tab1" class="tab-content active">
+                <!-- Hero Banner -->
+                <div class="bg-gradient-to-br from-indigo-700 to-blue-600 rounded-2xl p-6 md:p-10 text-white mb-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6">
+                    <div class="relative z-10 flex-1">
+                        <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium backdrop-blur-sm mb-4">Worldview / Konsep Utama</span>
+                        <h2 class="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">Membangun Keseimbangan dalam Bernegara</h2>
+                        <p class="text-indigo-100 text-lg leading-relaxed text-justify mb-6">Dalam kehidupan berbangsa dan bernegara, hak dan kewajiban diatur dengan tegas dalam konstitusi UUD NRI Tahun 1945. Ini berfungsi sebagai jaminan sekaligus pedoman. <b>Hak asasi</b> harus selalu dilakukan beriringan dengan <b>kewajiban asasi</b> agar tercipta ketertiban dan kesejahteraan masyarakat yang berkeadilan.</p>
+                    </div>
+                    <div class="w-full md:w-1/3 relative z-10">
+                        <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Konsep Keadilan" class="rounded-xl shadow-lg border-4 border-white/20 object-cover h-48 w-full">
+                    </div>
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-blue-400 opacity-10 rounded-full blur-3xl"></div>
+                </div>
+
+                <!-- 3 Card Highlights -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Makna Hak</h3>
+                        <p class="text-sm text-slate-600">Sesuatu yang mutlak menjadi milik kita dan penggunaannya bergantung kepada kita sendiri secara bertanggung jawab.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
+                        <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-clipboard-list"></i></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Makna Kewajiban</h3>
+                        <p class="text-sm text-slate-600">Sesuatu yang harus dilaksanakan dengan penuh rasa tanggung jawab sebelum menuntut hak kita.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">Keseimbangan</h3>
+                        <p class="text-sm text-slate-600">Pelaksanaan hak dan kewajiban yang tidak seimbang berpotensi menimbulkan konflik dalam kehidupan bermasyarakat.</p>
+                    </div>
+                </div>
+
+                <!-- Analisis Mendalam -->
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 border-l-4 border-indigo-600 pl-4">Analisis Mendalam: Kenapa Diatur UUD?</h3>
+                    <p class="text-slate-600 mb-4 leading-relaxed">UUD NRI Tahun 1945 bukan sekadar dokumen mati, melainkan fondasi kokoh yang memastikan negara berfungsi optimal. Dengan mencantumkan Hak Asasi Manusia (HAM) secara eksplisit, negara membatasi kekuasaannya agar tidak sewenang-wenang terhadap rakyat.</p>
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 flex gap-4 mt-4">
+                        <div class="text-indigo-500 text-2xl mt-1"><i class="fa-solid fa-lightbulb"></i></div>
+                        <div>
+                            <h4 class="font-bold text-indigo-900">Contoh Implementasi Keseharian</h4>
+                            <p class="text-sm text-indigo-800 mt-1">Setiap anak di Indonesia memiliki hak dasar atas pendidikan (Pasal 31). Namun, saat kamu menerima fasilitas sekolah dari negara (hak), kamu juga memikul kewajiban untuk belajar giat dan menjaga fasilitas tersebut dengan baik agar dapat digunakan oleh generasi berikutnya (kewajiban).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: HAK WARGA NEGARA -->
+            <div id="tab2" class="tab-content">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-800">Hak Warga Negara dalam UUD 1945</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Ringkasan -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center"><i class="fa-solid fa-book-open text-emerald-500 mr-2"></i>Ringkasan Materi</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed text-justify mb-4">
+                            UUD NRI Tahun 1945 memberikan jaminan kuat terhadap Hak Asasi Manusia. Hak ini bersifat universal dan tidak dapat dicabut. Bab XA UUD 1945 menguraikan secara rinci jaminan ini, mulai dari hak untuk hidup, hak atas kepastian hukum, hak pendidikan, hingga kebebasan memeluk agama.
+                        </p>
+                        <p class="text-slate-600 text-sm leading-relaxed text-justify">
+                            Pasal 27 hingga Pasal 31 merupakan urat nadi perlindungan hak asasi yang membuktikan bahwa Indonesia adalah negara hukum yang mengutamakan kesejahteraan warganya.
+                        </p>
+                    </div>
+
+                    <!-- Kasus Realistis -->
+                    <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 text-emerald-500/10 text-9xl -mr-6 -mt-6"><i class="fa-solid fa-briefcase"></i></div>
+                        <h3 class="text-lg font-bold text-emerald-900 mb-3 relative z-10 flex items-center"><i class="fa-solid fa-camera-retro text-emerald-600 mr-2"></i>Contoh Kasus Realistis</h3>
+                        <div class="bg-white/80 p-4 rounded-lg shadow-sm relative z-10">
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">Dunia Kerja & Penghidupan Layak</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-3">Seseorang yang telah lulus sekolah melamar pekerjaan. Berdasarkan <b>Pasal 27 ayat (2)</b>, ia berhak mendapatkan upah yang layak (sesuai UMR daerahnya) serta kondisi kerja yang manusiawi. Perusahaan tidak boleh bertindak sewenang-wenang terhadap hak-hak dasar pekerja tersebut.</p>
+                            <span class="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded">Pasal 27 Ayat (2)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Poin -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800"><i class="fa-solid fa-list-check text-indigo-500 mr-2"></i>Poin Penting Jaminan Hak</h3>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+                        <div class="p-4 px-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="w-full md:w-1/4 font-semibold text-slate-700 bg-slate-100 px-3 py-2 rounded text-center md:text-left text-sm">Pasal 28E Ayat (3)</div>
+                            <div class="w-full md:w-3/4 text-slate-600 text-sm">Setiap orang berhak atas kebebasan berserikat, berkumpul, dan mengeluarkan pendapat.</div>
+                        </div>
+                        <div class="p-4 px-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="w-full md:w-1/4 font-semibold text-slate-700 bg-slate-100 px-3 py-2 rounded text-center md:text-left text-sm">Pasal 29 Ayat (2)</div>
+                            <div class="w-full md:w-3/4 text-slate-600 text-sm">Negara menjamin kemerdekaan tiap-tiap penduduk untuk memeluk agamanya masing-masing dan beribadat.</div>
+                        </div>
+                        <div class="p-4 px-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center gap-4">
+                            <div class="w-full md:w-1/4 font-semibold text-slate-700 bg-slate-100 px-3 py-2 rounded text-center md:text-left text-sm">Pasal 31 Ayat (1)</div>
+                            <div class="w-full md:w-3/4 text-slate-600 text-sm">Setiap warga negara berhak mendapat pendidikan tanpa pengecualian.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: KEWAJIBAN WARGA NEGARA -->
+            <div id="tab3" class="tab-content">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"><i class="fa-solid fa-user-shield"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-800">Kewajiban Warga Negara dalam UUD 1945</h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+                    <!-- Kasus Realistis -->
+                    <div class="lg:col-span-2 bg-rose-50 p-6 rounded-xl border border-rose-100 relative overflow-hidden flex flex-col justify-center">
+                        <h3 class="text-lg font-bold text-rose-900 mb-4 relative z-10 flex items-center"><i class="fa-solid fa-building-shield text-rose-600 mr-2"></i>Contoh Kasus Realistis</h3>
+                        <div class="bg-white/80 p-4 rounded-lg shadow-sm relative z-10 mb-4">
+                            <h4 class="font-bold text-slate-800 text-sm mb-1"><i class="fa-solid fa-money-bill-wave text-rose-500 mr-1"></i> Membayar Pajak Tepat Waktu</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">Pajak digunakan pemerintah untuk membangun infrastruktur publik (jalan, sekolah, puskesmas). Membayar pajak adalah wujud nyata kewajiban bela negara dan menjunjung hukum secara ekonomi.</p>
+                        </div>
+                        <div class="bg-white/80 p-4 rounded-lg shadow-sm relative z-10">
+                            <h4 class="font-bold text-slate-800 text-sm mb-1"><i class="fa-solid fa-users-viewfinder text-rose-500 mr-1"></i> Partisipasi Siskamling</h4>
+                            <p class="text-sm text-slate-600 leading-relaxed">Masyarakat bergiliran menjaga pos ronda di lingkungan desa. Ini merupakan bentuk langsung keikutsertaan dalam usaha pertahanan dan keamanan negara (Pasal 30 ayat 1).</p>
+                        </div>
+                    </div>
+
+                    <!-- Ringkasan & Highlight -->
+                    <div class="lg:col-span-3 flex flex-col gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center"><i class="fa-solid fa-book-open text-rose-500 mr-2"></i>Ringkasan Materi</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed text-justify mb-4">
+                                Tidak ada hak tanpa kewajiban asasi. UUD NRI Tahun 1945 menggarisbawahi bahwa di samping kebebasan individu, terdapat kewajiban kolektif untuk merawat keutuhan negara dan menghargai hak orang lain.
+                            </p>
+                            <p class="text-slate-600 text-sm leading-relaxed text-justify">
+                                Kewajiban-kewajiban ini mencakup kepatuhan terhadap hukum, partisipasi bela negara, dan pembatasan kebebasan pribadi demi menjamin ketertiban umum. Jika kewajiban asasi tidak dijalankan, niscaya hak asasi tidak akan pernah terwujud dengan baik.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-rose-300 transition-colors">
+                                <span class="text-xs font-bold text-rose-500 mb-1 block">Pasal 27 Ayat (1)</span>
+                                <p class="text-sm text-slate-700 font-medium">Wajib menjunjung tinggi hukum dan pemerintahan tanpa pengecualian.</p>
+                            </div>
+                            <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-rose-300 transition-colors">
+                                <span class="text-xs font-bold text-rose-500 mb-1 block">Pasal 28J Ayat (1)</span>
+                                <p class="text-sm text-slate-700 font-medium">Wajib menghormati Hak Asasi Manusia orang lain dalam bermasyarakat.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: KESEIMBANGAN -->
+            <div id="tab4" class="tab-content">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-800">Pelaksanaan secara Seimbang</h2>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200 mb-6">
+                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                        <div class="w-full md:w-2/3">
+                            <h3 class="text-xl font-bold text-slate-800 mb-4">Tantangan Pemenuhan Hak dan Kewajiban</h3>
+                            <p class="text-slate-600 mb-4 leading-relaxed text-justify text-sm">
+                                Pelaksanaan yang tidak seimbang sering kali menjadi sumber masalah sosial, seperti konflik, permusuhan, bahkan tindakan kriminal. Misalnya, seseorang yang menuntut kebebasan berpendapat secara mutlak di media sosial (Hak), sering mengabaikan fakta bahwa ia wajib menghormati kehormatan orang lain (Kewajiban), sehingga timbul masalah <i>cyberbullying</i> (perundungan siber).
+                            </p>
+                            <h4 class="font-bold text-slate-700 text-sm mb-2 mt-6">Upaya Penyeimbangan:</h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-sm text-slate-600">Ingin lingkungan sehat (Hak), maka wajib membuang sampah pada tempatnya (Kewajiban).</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-sm text-slate-600">Ingin jalan raya lancar dan aman (Hak), maka wajib menaati rambu-rambu lalu lintas (Kewajiban).</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-check text-emerald-500 mt-1 mr-3"></i>
+                                    <span class="text-sm text-slate-600">Ingin dihargai teman-teman (Hak), maka wajib menghargai dan tidak merundung/bullying (Kewajiban).</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 shadow-inner">
+                                <div class="text-center mb-3">
+                                    <i class="fa-solid fa-ban text-rose-500 text-4xl mb-2"></i>
+                                    <h4 class="font-bold text-amber-900">Stop Perundungan!</h4>
+                                </div>
+                                <p class="text-xs text-amber-800 text-center leading-relaxed">
+                                    Tawuran dan perundungan <i>(bullying)</i> di sekolah merupakan wujud pelanggaran HAM berat tingkat remaja yang mengabaikan keseimbangan antara hak untuk dihargai dan kewajiban menghormati.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: FLASHCARD INTERAKTIF -->
+            <div id="tab5" class="tab-content">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"><i class="fa-solid fa-clone"></i></div>
+                        <h2 class="text-2xl font-bold text-slate-800">Kuis Interaktif (Flashcard)</h2>
+                    </div>
+                    <span class="text-sm font-medium text-slate-500 hidden md:inline-block"><i class="fa-solid fa-hand-pointer mr-2 animate-bounce"></i>Klik kartu untuk membalik</span>
+                </div>
+                
+                <p class="text-slate-600 mb-6 text-sm">Uji ingatanmu! Ketuk atau klik setiap kartu di bawah ini untuk melihat jawaban dari pertanyaan seputar Hak dan Kewajiban Warga Negara.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="flip-card" onclick="flipCard(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold absolute top-4 left-4">Kartu 1</span>
+                                <i class="fa-solid fa-circle-question text-3xl text-indigo-400 mb-3"></i>
+                                <p class="text-sm font-semibold text-center">Apa sebutan hak dasar yang melekat pada manusia dan dilindungi UUD NRI 1945?</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <i class="fa-solid fa-lightbulb text-3xl text-amber-300 mb-3"></i>
+                                <p class="text-lg font-bold text-center">Hak Asasi Manusia (HAM)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="flip-card" onclick="flipCard(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold absolute top-4 left-4">Kartu 2</span>
+                                <i class="fa-solid fa-circle-question text-3xl text-indigo-400 mb-3"></i>
+                                <p class="text-sm font-semibold text-center">Pasal berapakah yang secara khusus menyatakan bahwa tiap warga negara berhak mendapat pendidikan?</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <i class="fa-solid fa-lightbulb text-3xl text-amber-300 mb-3"></i>
+                                <p class="text-lg font-bold text-center">Pasal 31 Ayat (1)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="flip-card" onclick="flipCard(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold absolute top-4 left-4">Kartu 3</span>
+                                <i class="fa-solid fa-circle-question text-3xl text-indigo-400 mb-3"></i>
+                                <p class="text-sm font-semibold text-center">Kewajiban warga negara untuk menjunjung tinggi hukum dan pemerintahan diatur dalam pasal?</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <i class="fa-solid fa-lightbulb text-3xl text-amber-300 mb-3"></i>
+                                <p class="text-lg font-bold text-center">Pasal 27 Ayat (1)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="flip-card" onclick="flipCard(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold absolute top-4 left-4">Kartu 4</span>
+                                <i class="fa-solid fa-circle-question text-3xl text-indigo-400 mb-3"></i>
+                                <p class="text-sm font-semibold text-center">Apa istilah untuk seperangkat kewajiban yang jika diabaikan, membuat hak asasi mustahil terlaksana?</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <i class="fa-solid fa-lightbulb text-3xl text-amber-300 mb-3"></i>
+                                <p class="text-lg font-bold text-center">Kewajiban Asasi</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 5 -->
+                    <div class="flip-card md:col-span-1 sm:col-span-2 md:col-start-2" onclick="flipCard(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded text-xs font-bold absolute top-4 left-4">Kartu 5</span>
+                                <i class="fa-solid fa-circle-question text-3xl text-indigo-400 mb-3"></i>
+                                <p class="text-sm font-semibold text-center">Pasal 29 ayat (2) menjamin kemerdekaan penduduk untuk hal apa?</p>
+                            </div>
+                            <div class="flip-card-back">
+                                <i class="fa-solid fa-lightbulb text-3xl text-amber-300 mb-3"></i>
+                                <p class="text-base font-bold text-center px-4">Memeluk agama dan beribadah menurut agama/kepercayaannya.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: ASESMEN ISIAN SINGKAT -->
+            <div id="tab6" class="tab-content">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"><i class="fa-solid fa-pen-clip"></i></div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Asesmen Isian Singkat</h2>
+                            <p class="text-sm text-slate-500">Jawablah 10 pertanyaan berikut dengan satu atau dua kata yang tepat.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white px-5 py-2 border border-slate-200 rounded-lg shadow-sm text-center">
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Nilai</p>
+                        <p id="score-display" class="text-2xl font-extrabold text-indigo-600">0 / 100</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+                    <form id="asesmen-form" onsubmit="submitAsesmen(event)">
+                        <!-- Data Diri -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Nama Lengkap</label>
+                                <input type="text" id="nama" required class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Kelas</label>
+                                <input type="text" id="kelas" required class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">Tanggal</label>
+                                <input type="date" id="tanggal" required class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <!-- 10 Soal List -->
+                        <div class="space-y-6">
+                            <!-- Soal 1 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">1.</span>Seperangkat hak yang melekat pada hakikat keberadaan manusia sebagai makhluk Tuhan Yang Maha Esa disebut Hak Asasi ...</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q1" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q1" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q1" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 2 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">2.</span>Pasal 27 ayat (2) menyatakan tiap warga negara berhak atas pekerjaan dan penghidupan yang ...</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q2" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q2" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q2" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 3 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">3.</span>Menurut Pasal 27 ayat (3), setiap warga negara berhak dan wajib ikut serta dalam upaya ... negara.</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q3" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q3" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q3" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 4 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">4.</span>Pasal 31 ayat (1) UUD NRI Tahun 1945 menjamin hak warga negara untuk mendapatkan ...</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q4" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q4" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q4" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 5 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">5.</span>Segala warga negara bersamaan kedudukannya di dalam hukum dan ... (Sesuai Pasal 27 ayat 1).</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q5" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q5" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q5" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 6 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">6.</span>Seperangkat kewajiban yang apabila tidak dilaksanakan, hak asasi tidak mungkin terlaksana disebut ... asasi.</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q6" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q6" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q6" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 7 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">7.</span>Pasal 28E ayat (3) menjamin hak atas kebebasan berserikat, berkumpul, dan mengeluarkan ...</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q7" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q7" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q7" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 8 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">8.</span>Setiap orang wajib menghormati hak asasi manusia orang lain diatur dalam Pasal 28J ayat ... (Tulis angkanya).</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q8" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q8" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q8" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 9 -->
+                            <div class="pb-4 border-b border-slate-100 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">9.</span>Ikut serta dalam usaha pertahanan dan keamanan negara adalah wujud dari ... setiap warga negara.</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q9" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Jawaban singkat">
+                                    <div id="icon-q9" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q9" class="mt-1"></div>
+                            </div>
+                            <!-- Soal 10 -->
+                            <div class="pb-4 relative group">
+                                <p class="text-sm text-slate-800 font-medium mb-2"><span class="font-bold mr-2 text-indigo-600">10.</span>Jaminan kemerdekaan memeluk agama dan beribadat diatur dalam UUD NRI Tahun 1945 Pasal ... (Tulis angkanya).</p>
+                                <div class="flex items-center gap-3">
+                                    <input type="text" id="q10" class="w-full md:w-1/2 border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: 29">
+                                    <div id="icon-q10" class="w-6 text-center"></div>
+                                </div>
+                                <div id="feedback-q10" class="mt-1"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="mt-8 flex items-center gap-4">
+                            <button type="submit" id="submit-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md transition-colors w-full md:w-auto">
+                                <i class="fa-solid fa-paper-plane mr-2"></i>Koreksi & Kirim Nilai
+                            </button>
+                            <button type="button" onclick="resetAsesmen()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2.5 rounded-lg font-semibold transition-colors w-full md:w-auto">
+                                <i class="fa-solid fa-rotate-left mr-2"></i>Reset
+                            </button>
+                        </div>
+                        <p id="system-msg" class="text-sm mt-3 font-semibold"></p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 7: KESIMPULAN & REFLEKSI -->
+            <div id="tab7" class="tab-content">
+                <div class="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-slate-200 text-center max-w-3xl mx-auto mt-8">
+                    <i class="fa-solid fa-quote-left text-5xl text-slate-200 mb-6 block"></i>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-6">Refleksi Pembelajaran</h2>
+                    <p class="text-slate-600 text-lg leading-relaxed mb-8">
+                        Menjadi warga negara yang baik bukan hanya tentang menikmati <b>hak</b> yang diberikan oleh negara dan konstitusi, melainkan tentang kesadaran untuk memenuhi <b>kewajiban</b> kita terhadap negara dan sesama. Keseimbangan inilah yang menjaga keutuhan, kedamaian, dan kemajuan Bangsa Indonesia.
+                    </p>
+                    <button onclick="openTab('tab1', document.querySelector('.nav-chip'), 1)" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-6 py-2 rounded-full font-semibold transition-colors">
+                        Kembali ke Awal <i class="fa-solid fa-arrow-up ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Set today's date in form
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        // Navigasi Tab
+        function openTab(tabId, element, stepIndex) {
+            // Sembunyikan semua tab
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Tampilkan tab tujuan
+            document.getElementById(tabId).classList.add('active');
+            
+            // Reset style semua chip
+            document.querySelectorAll('.nav-chip').forEach(c => {
+                c.className = 'nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-300';
+            });
+            
+            // Highlight chip aktif
+            element.className = 'nav-chip whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-200 transition-all duration-300';
+            
+            // Scroll chip ke tengah
+            element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+            // Update indikator modul
+            document.getElementById('module-indicator').innerText = `Modul ${stepIndex} / 7`;
+        }
+
+        // Animasi Balik Kartu Flashcard
+        function flipCard(element) {
+            element.classList.toggle('flipped');
+        }
+
+        // Fullscreen API
+        function toggleFullscreen() {
+            let elem = document.documentElement;
+            let icon = document.getElementById('fs-icon');
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().then(() => {
+                    icon.classList.remove('fa-expand');
+                    icon.classList.add('fa-compress');
+                }).catch(err => {
+                    console.log(`Error: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    icon.classList.add('fa-expand');
+                    icon.classList.remove('fa-compress');
+                });
+            }
+        }
+
+        // Kunci Jawaban Asesmen
+        const answers = [
+            ['manusia'], // Q1
+            ['layak'], // Q2
+            ['pembelaan', 'bela', 'pertahanan'], // Q3
+            ['pendidikan'], // Q4
+            ['pemerintahan'], // Q5
+            ['kewajiban'], // Q6
+            ['pendapat', 'opini'], // Q7
+            ['1', '(1)', 'satu'], // Q8
+            ['kewajiban', 'hak dan kewajiban'], // Q9
+            ['29', '29 ayat 2', '29 ayat (2)'] // Q10
+        ];
+
+        // Validasi dan Submit Form
+        function submitAsesmen(e) {
+            e.preventDefault();
+            let score = 0;
+            let rincian = [];
+
+            // Proses setiap soal
+            for(let i=1; i<=10; i++) {
+                const inputVal = document.getElementById('q'+i).value.trim().toLowerCase();
+                const icon = document.getElementById('icon-q'+i);
+                const feedback = document.getElementById('feedback-q'+i);
+                
+                // Cek jawaban
+                let isCorrect = answers[i-1].some(ans => inputVal.includes(ans) && inputVal !== "");
+                
+                if (isCorrect) {
+                    score += 10;
+                    icon.innerHTML = '<i class="fa-solid fa-check text-emerald-500 text-lg"></i>';
+                    feedback.innerHTML = '<span class="text-emerald-500 text-xs font-bold"><i class="fa-solid fa-check-circle mr-1"></i>Benar</span>';
+                    rincian.push(`Q${i}: Benar (${inputVal})`);
+                } else {
+                    icon.innerHTML = '<i class="fa-solid fa-xmark text-rose-500 text-lg"></i>';
+                    feedback.innerHTML = `<span class="text-rose-500 text-xs font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i>Salah. Kunci: ${answers[i-1][0]}</span>`;
+                    rincian.push(`Q${i}: Salah (${inputVal})`);
+                }
+            }
+            
+            // Tampilkan Skor
+            document.getElementById('score-display').innerText = `${score} / 100`;
+            
+            // Payload untuk Google Sheet
+            const payload = {
+                nama: document.getElementById('nama').value,
+                kelas: document.getElementById('kelas').value,
+                tanggal: document.getElementById('tanggal').value,
+                skor: score,
+                keterangan: score >= 70 ? 'Tuntas' : 'Belum Tuntas',
+                rincian: rincian.join(' | ')
+            };
+
+            const submitBtn = document.getElementById('submit-btn');
+            const sysMsg = document.getElementById('system-msg');
+            
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Mengirim...';
+            submitBtn.disabled = true;
+            sysMsg.innerText = '';
+
+            // URL Web App Google Apps Script Anda (Ganti dengan URL Deploy Anda yang sebenarnya)
+            // Contoh: const gasUrl = 'https://script.google.com/macros/s/AKfycb.../exec';
+            const gasUrl = 'https://script.google.com/macros/s/AKfycbwAsAA_bnXPEg7Tug4Ni71CJ4sOZB-zrDQYTTj_VvDZUQS2douFCx0lmkEseNtt2c31/exec'; 
+
+            if(gasUrl === 'YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE') {
+                // Simulasi sukses jika URL belum diisi (untuk keperluan demo UI)
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Koreksi & Kirim Nilai';
+                    submitBtn.disabled = false;
+                    sysMsg.className = "text-sm mt-3 font-semibold text-emerald-600";
+                    sysMsg.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i>Koreksi selesai! Skor Anda: ${score}. (Catatan: URL GS belum diatur untuk menyimpan data).`;
+                }, 1000);
+                return;
+            }
+
+            // Fetch ke Google Script (Aktifkan jika URL sudah ada)
+            fetch(gasUrl, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            }).then(res => res.json())
+              .then(data => {
+                  submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Koreksi & Kirim Nilai';
+                  submitBtn.disabled = false;
+                  sysMsg.className = "text-sm mt-3 font-semibold text-emerald-600";
+                  sysMsg.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i>Data nilai berhasil disimpan ke server.`;
+              }).catch(err => {
+                  submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-2"></i>Koreksi & Kirim Nilai';
+                  submitBtn.disabled = false;
+                  sysMsg.className = "text-sm mt-3 font-semibold text-rose-600";
+                  sysMsg.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i>Gagal menyimpan data ke server. Periksa koneksi Anda.`;
+                  console.error(err);
+              });
+        }
+
+        // Reset Form Asesmen
+        function resetAsesmen() {
+            document.getElementById('asesmen-form').reset();
+            document.getElementById('tanggal').valueAsDate = new Date();
+            document.getElementById('score-display').innerText = '0 / 100';
+            document.getElementById('system-msg').innerText = '';
+            for(let i=1; i<=10; i++) {
+                document.getElementById('icon-q'+i).innerHTML = '';
+                document.getElementById('feedback-q'+i).innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
